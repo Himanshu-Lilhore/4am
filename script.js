@@ -1,7 +1,13 @@
 let refreshBtn = document.getElementById("refreshBtn");
+let vidHolder = document.getElementById("vidHolder");
 let vid = document.getElementById("vid");
+let playDiv = document.querySelector('#play');
+let pauseDiv = document.querySelector('#pause');
 
 refreshBtn.addEventListener('click', randVid);
+vidHolder.addEventListener('click', playpause);
+
+randVid();
 
 function randVid(){
     let randNum = getRandomNumber(1,101);
@@ -17,7 +23,18 @@ function getRandomNumber(min, max) {
 }
 
 
-
+function playpause(){
+    let whichDiv;
+    if (vid.paused) {
+        vid.play();
+        whichDiv = playDiv;
+    } else {
+        vid.pause();
+        whichDiv = pauseDiv;
+    }
+    whichDiv.classList.remove('hidden');
+    setTimeout(()=>{whichDiv.classList.add('hidden')}, 500);
+}
 
 
 
