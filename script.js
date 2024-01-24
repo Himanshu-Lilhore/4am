@@ -1,3 +1,5 @@
+let totalVids = 131;
+
 let refreshBtn = document.getElementById("refreshBtn");
 let vidHolder = document.getElementById("vidHolder");
 let vid = document.getElementById("vid");
@@ -10,7 +12,7 @@ vidHolder.addEventListener('click', playpause);
 randVid();
 
 function randVid(){
-    let randNum = getRandomNumber(1,101);
+    let randNum = getRandomNumber(1,totalVids);
     vid.setAttribute("src", "./videos/"+randNum+".mp4");
     console.log(randNum);
 }
