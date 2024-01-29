@@ -1,0 +1,17 @@
+/* Popup container */
+.popup {
+    background-color: black;
+  }
+  
+/* The actual popup (appears on top) */
+.popuptext {
+color: #fff;
+text-align: center;
+border-radius: 6px;
+}
+
+.indv-settings{
+    width : 100%;
+    padding: 3px 0;
+    margin: 3px 0;
+}

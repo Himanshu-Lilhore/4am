@@ -9,20 +9,37 @@ let pauseDiv = document.querySelector('#pause');
 let loopToggleBtn = document.querySelector('#loopToggle');
 let playlist = document.querySelector('#playlist');
 let loop = document.querySelector('#loop');
+let settingsBtn = document.querySelector('#settings');
+let settingsPanel = document.querySelector('#settingsPanel');
+let closeSettingsBtn = document.querySelector('#closeSettings');
+let logDisplay = document.querySelector('#log');
+
 
 refreshBtn.addEventListener('click', randVid);
-vidHolder.addEventListener('click', playpause);
+vid.addEventListener('click', playpause);
 loopToggleBtn.addEventListener('click', toggleLoopMode);
 vid.addEventListener('loadedmetadata', onVideoLoadedMetadata);
 vid.addEventListener('timeupdate', checkIfVideoEnded);
 vid.addEventListener('ended', playNext);
+settingsBtn.addEventListener('click', toggleSettingsPanel);
+closeSettingsBtn.addEventListener('click', toggleSettingsPanel);
 
 randVid();
+
+function logger(output)
+{
+    console.log(output);
+
+    let btemp = document.createElement("span");
+    btemp.textContent = output;
+    btemp.classList.add("block");
+    logDisplay.appendChild(btemp);
+}
 
 function randVid(){
     let randNum = getRandomNumber(1,totalVids);
     vid.setAttribute("src", "./videos/"+randNum+".mp4");
-    console.log(randNum);
+    logger(randNum);
 }
 
 function checkIfVideoEnded() {
@@ -32,7 +49,8 @@ function checkIfVideoEnded() {
 }
 
 function onVideoLoadedMetadata() {
-    console.log("Video duration:", vid.duration);
+    logger("Video duration : " + vid.duration);
+
     if (vid.duration !== Infinity) {
         vid.addEventListener('timeupdate', checkIfVideoEnded);
     }
@@ -50,9 +68,11 @@ function playpause(){
     let whichDiv;
     if (vid.paused) {
         vid.play();
+        logger("Played");
         whichDiv = playDiv;
     } else {
         vid.pause();
+        logger("Paused");
         whichDiv = pauseDiv;
     }
     whichDiv.classList.remove('hidden');
@@ -64,18 +84,22 @@ function toggleLoopMode(){
     loop.classList.toggle("hidden");
     playlist.classList.toggle("hidden");
     isLooping = !isLooping;
-    console.log("toggleed play mode : " + isLooping);
+    logger("Toggled play mode : " + isLooping);
 }
 
 function playNext(){
     if(!isLooping){
-        console.log("not looping");
+        logger("Not looping");
         randVid();
     }
     else{
         vid.play();
-        console.log("looping");
+        logger("Looping");
     }
+}
+
+function toggleSettingsPanel(){
+    settingsPanel.classList.toggle("hidden");
 }
 
 
