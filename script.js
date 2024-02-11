@@ -13,7 +13,8 @@ let settingsBtn = document.querySelector('#settings');
 let settingsPanel = document.querySelector('#settingsPanel');
 let closeSettingsBtn = document.querySelector('#closeSettings');
 let logDisplay = document.querySelector('#log');
-
+let progBar = document.querySelector('#progBar');
+let vidDur, vidCur
 
 refreshBtn.addEventListener('click', randVid);
 vid.addEventListener('click', playpause);
@@ -24,7 +25,11 @@ vid.addEventListener('ended', playNext);
 settingsBtn.addEventListener('click', toggleSettingsPanel);
 closeSettingsBtn.addEventListener('click', toggleSettingsPanel);
 
+
+document.addEventListener("DOMContentLoaded", function() {
 randVid();
+})
+
 
 function logger(output)
 {
@@ -33,17 +38,27 @@ function logger(output)
     let btemp = document.createElement("span");
     btemp.textContent = output;
     btemp.classList.add("block");
-    logDisplay.appendChild(btemp);
+    // logDisplay.appendChild(btemp);
+    if (logDisplay.firstChild) {
+        logDisplay.insertBefore(btemp, logDisplay.firstChild);
+    } else {
+        logDisplay.appendChild(btemp);
+    }
 }
 
 function randVid(){
     let randNum = getRandomNumber(1,totalVids);
     vid.setAttribute("src", "./videos/"+randNum+".mp4");
     logger(randNum);
+    startAnimation()
+    updateProgBar()
 }
 
 function checkIfVideoEnded() {
-    if (vid.currentTime >= vid.duration - 0.5) {
+    vidDur = vid.duration
+    vidCur = vid.currentTime
+    updateProgBar()
+    if (vid.currentTime >= vid.duration - 0.25) {
         playNext();
     }
 }
@@ -100,6 +115,10 @@ function playNext(){
 
 function toggleSettingsPanel(){
     settingsPanel.classList.toggle("hidden");
+}
+
+function updateProgBar(){
+    progBar.style = `width:${(vidCur/vidDur)*100}%;`
 }
 
 

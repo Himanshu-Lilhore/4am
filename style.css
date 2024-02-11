@@ -2,7 +2,7 @@
 .popup {
     background-color: black;
   }
-  
+
 /* The actual popup (appears on top) */
 .popuptext {
 color: #fff;
@@ -10,8 +10,29 @@ text-align: center;
 border-radius: 6px;
 }
 
+#title{
+  color:rgb(65, 24, 102);
+}
+
 .indv-settings{
     width : 100%;
     padding: 3px 0;
     margin: 3px 0;
 }
+
+#progBar{
+  /* animation:grow 1000s forwards linear; */
+  border-width: 3px;
+  border-color: rgb(9, 102, 23);
+}
+
+/* @keyframes grow {
+  0%{
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  100%{
+    transform: scaleX(1);
+    transform-origin: left;
+  }  
+} */
