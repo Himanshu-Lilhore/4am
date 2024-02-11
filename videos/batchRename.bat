@@ -15,3 +15,7 @@ for %%F in (*.mp4) do (
 echo Renaming complete.
 
 endlocal
+
+echo !!!!! Change totalVids variable accordingly !!!!!
+
+pause
