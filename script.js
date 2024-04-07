@@ -22,8 +22,8 @@ loopToggleBtn.addEventListener('click', toggleLoopMode);
 vid.addEventListener('loadedmetadata', onVideoLoadedMetadata);
 vid.addEventListener('timeupdate', checkIfVideoEnded);
 vid.addEventListener('ended', playNext);
-settingsBtn.addEventListener('click', toggleSettingsPanel);
-closeSettingsBtn.addEventListener('click', toggleSettingsPanel);
+settingsBtn.addEventListener('click', handleSettingClick);
+closeSettingsBtn.addEventListener('click', handleSettingClick);
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -50,7 +50,7 @@ function randVid(){
     let randNum = getRandomNumber(1,totalVids);
     vid.setAttribute("src", "./videos/"+randNum+".mp4");
     logger(randNum);
-    startAnimation()
+    // startAnimation()
     updateProgBar()
 }
 
@@ -80,16 +80,19 @@ function getRandomNumber(min, max) {
 
 
 function playpause(){
-    let whichDiv;
+    let whichDiv, otherDiv;
     if (vid.paused) {
         vid.play();
         logger("Played");
         whichDiv = playDiv;
+        otherDiv = pauseDiv
     } else {
         vid.pause();
         logger("Paused");
         whichDiv = pauseDiv;
+        otherDiv = playDiv
     }
+    otherDiv.classList.add('hidden');
     whichDiv.classList.remove('hidden');
     setTimeout(()=>{whichDiv.classList.add('hidden')}, 500);
 }
@@ -99,7 +102,8 @@ function toggleLoopMode(){
     loop.classList.toggle("hidden");
     playlist.classList.toggle("hidden");
     isLooping = !isLooping;
-    logger("Toggled play mode : " + isLooping);
+    vid.loop = isLooping;
+    logger("Looping : " + isLooping);
 }
 
 function playNext(){
@@ -113,7 +117,9 @@ function playNext(){
     }
 }
 
-function toggleSettingsPanel(){
+let rotationVal = 0
+function handleSettingClick(){
+    settingsBtn.style.transform = `rotate(${rotationVal+60}deg)`; rotationVal += 60;
     settingsPanel.classList.toggle("hidden");
 }
 

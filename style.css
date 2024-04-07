@@ -1,3 +1,7 @@
+body{
+    user-select: none;
+}
+
 /* Popup container */
 .popup {
     background-color: black;
@@ -12,6 +16,7 @@ border-radius: 6px;
 
 #title{
   color:rgb(65, 24, 102);
+  font-weight: bold;
 }
 
 .indv-settings{
@@ -21,18 +26,14 @@ border-radius: 6px;
 }
 
 #progBar{
-  /* animation:grow 1000s forwards linear; */
   border-width: 3px;
   border-color: rgb(9, 102, 23);
 }
 
-/* @keyframes grow {
-  0%{
-    transform: scaleX(0);
-    transform-origin: left;
-  }
-  100%{
-    transform: scaleX(1);
-    transform-origin: left;
-  }  
-} */
+#play, #pause{
+  pointer-events: none;
+}
+
+#settings{
+  transition: transform ease-out 300ms;
+}
