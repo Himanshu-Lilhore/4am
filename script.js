@@ -28,9 +28,7 @@ closeSettingsBtn.addEventListener('click', handleSettingClick);
 
 document.addEventListener("DOMContentLoaded", function() {
 randVid();
-setTimeout(()=>{
-    vid.setAttribute("autoplay", "")
-}, 200);
+vid.setAttribute("autoplay", "")
 })
 
 
