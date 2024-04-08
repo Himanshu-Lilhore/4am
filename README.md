@@ -17,7 +17,3 @@ The primary goal of 4am is to serve as a learning exercise in web development, s
 ## Getting Started
 
 To get started with 4am, simply clone the repository to your local machine and open the `index.html` file in your web browser.
-
-## License
-
-4am is licensed under the [MIT License](./LICENSE).
