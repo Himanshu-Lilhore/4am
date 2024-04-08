@@ -28,7 +28,6 @@ closeSettingsBtn.addEventListener('click', handleSettingClick);
 
 document.addEventListener("DOMContentLoaded", function() {
 randVid();
-vid.setAttribute("autoplay", "")
 })
 
 
@@ -80,6 +79,7 @@ function getRandomNumber(min, max) {
 
 
 function playpause(){
+    vid.setAttribute("autoplay", "")
     let whichDiv, otherDiv;
     if (vid.paused) {
         vid.play();
