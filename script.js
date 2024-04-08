@@ -107,6 +107,7 @@ function toggleLoopMode(){
 }
 
 function playNext(){
+    vid.setAttribute("autoplay", "true")
     if(!isLooping){
         logger("Not looping");
         randVid();
