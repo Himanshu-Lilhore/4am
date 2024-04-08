@@ -28,6 +28,9 @@ closeSettingsBtn.addEventListener('click', handleSettingClick);
 
 document.addEventListener("DOMContentLoaded", function() {
 randVid();
+setTimeout(()=>{
+    vid.setAttribute("autoplay", "")
+}, 200);
 })
 
 
@@ -50,7 +53,6 @@ function randVid(){
     let randNum = getRandomNumber(1,totalVids);
     vid.setAttribute("src", "./videos/"+randNum+".mp4");
     logger(randNum);
-    // startAnimation()
     updateProgBar()
 }
 
@@ -107,7 +109,6 @@ function toggleLoopMode(){
 }
 
 function playNext(){
-    vid.setAttribute("autoplay", "true")
     if(!isLooping){
         logger("Not looping");
         randVid();
