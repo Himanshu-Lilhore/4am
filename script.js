@@ -1,4 +1,4 @@
-let totalVids = 129;
+let totalVids = 187;
 let isLooping = true;
 
 let refreshBtn = document.getElementById("refreshBtn");
