@@ -27,6 +27,7 @@ refreshBtn.addEventListener('click', randVid);
 vid.addEventListener('click', playpause);
 loopToggleBtn.addEventListener('click', toggleLoopMode);
 likeToggleBtn.addEventListener('click', toggleLike);
+likeToggleBtn.addEventListener('click', sendLike);
 vid.addEventListener('loadedmetadata', onVideoLoadedMetadata);
 vid.addEventListener('timeupdate', checkIfVideoEnded);
 vid.addEventListener('ended', playNext);
@@ -189,14 +190,16 @@ function updateProgBar() {
 }
 
 function sendLike() {
-    likeRetryInterval = setInterval(() => {
-        if(!likeUpdated && vidSize && vidDur) {
-            sendLikeReq()
-            clearInterval(likeRetryInterval)
-        } else {
-            logger("Retrying sending like request")
-        }
-    }, 500)
+    if(isLiked) {
+        likeRetryInterval = setInterval(() => {
+            if(!likeUpdated && vidSize && vidDur) {
+                sendLikeReq()
+                clearInterval(likeRetryInterval)
+            } else {
+                logger("Retrying sending like request")
+            }
+        }, 500)
+    }
 }
 
 function sendView() {
