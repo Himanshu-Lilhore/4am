@@ -217,6 +217,7 @@ function sendLikeReq() {
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
             size: `${vidSize}`,
             duration: `${vidDur}`,
@@ -241,6 +242,7 @@ function sendViewReq() {
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
             size: `${vidSize}`,
             duration: `${vidDur}`,
