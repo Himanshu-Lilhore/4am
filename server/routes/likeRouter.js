@@ -8,15 +8,14 @@ const addLike = async (req, res) => {
         if (!vidExists) {
             const newVid = await Video.create({
                 ...req.body,
-                likes: parseInt(req.body.likes),
-                views: 1
+                likes: 1,
             })
-            console.log("Video record created & like added!!")
-            res.status(200).json("Video record created & like added!")
+            console.log(`${req.body.vidNum} - record created & ❤️(like) added!!`)
+            res.status(200).json(`${req.body.vidNum} - record created & ❤️(like) added!`)
         } else {
-            vidExists.likes += parseInt(req.body.likes);
+            vidExists.likes += 1;
             await vidExists.save();
-            res.status(200).json("Like count updated !");
+            res.status(200).json(`${req.body.vidNum} - ❤️(like) count updated !`);
         }
     } catch (err) {
         res.status(400).json({ error: err.message })
@@ -29,23 +28,34 @@ const addView = async (req, res) => {
         if (!vidExists) {
             const newVid = await Video.create({
                 ...req.body,
-                likes: parseInt(req.body.likes),
                 views: 1
             })
-            console.log("Video record created & view added!!")
-            res.status(200).json("Video record created & view added!")
+            console.log(`${req.body.vidNum} - record created & 👁️(view) added!!`)
+            res.status(200).json(`${req.body.vidNum} - record created & 👁️(view) added!`)
         } else {
             vidExists.views++;
             await vidExists.save();
-            res.status(200).json("View count updated !");
+            res.status(200).json(`${req.body.vidNum} - 👁️(view) count updated !`);
         }
     } catch (err) {
         res.status(400).json({ error: err.message })
     }
 }
 
+const deleteAll = async (req, res) => {
+    try {
+            await Video.deleteMany({})
+            console.log("🗑️ - video records are now cleared.")
+            res.status(200).json({ message: "🗑️ - video records are now cleared." })
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+        console.log(err.message)
+    }
+}
+
 router.post('/like', addLike)
 router.post('/view', addView)
+router.get('/delete-all', deleteAll)
 
 
 module.exports = router; 

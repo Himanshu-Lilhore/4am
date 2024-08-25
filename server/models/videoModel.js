@@ -1,6 +1,9 @@
 const mongoose = require('mongoose')
 
 const videoSchema = new mongoose.Schema({
+    vidNum: {
+        type: Number
+    },
     size: {
         type: String
     },

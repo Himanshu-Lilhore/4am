@@ -1,6 +1,10 @@
 let totalVids = 187;
 let isLooping = true;
 let isLiked = false;
+let viewUpdated = false;
+let likeUpdated = false;
+let vidDur, vidCur, vidSize, vidNum = -1
+let viewRetryInterval, likeRetryInterval
 
 let refreshBtn = document.getElementById("refreshBtn");
 let vidHolder = document.getElementById("vidHolder");
@@ -18,7 +22,6 @@ let logDisplay = document.querySelector('#log');
 let progBar = document.querySelector('#progBar');
 let likeEmpty = document.querySelector('#likeEmpty');
 let likeFull = document.querySelector('#likeFull');
-let vidDur, vidCur, vidSize, vidNum
 
 refreshBtn.addEventListener('click', randVid);
 vid.addEventListener('click', playpause);
@@ -50,21 +53,24 @@ function logger(output) {
     }
 }
 
-function randVid() {
-    let vidNum = getRandomNumber(1, totalVids);
+async function randVid() {
+    (vidNum !== -1 && isLiked) && sendLike();        // sending ❤️ LIKE
+    resetLike(); resetView();
+    vidNum = getRandomNumber(1, totalVids);
     vid.setAttribute("src", "./videos/" + vidNum + ".mp4");
+    let inited = await initVideo(vidNum);
     logger(vidNum);
     updateProgBar()
+    sendView()     // sending 👁️ VIEW
 }
+
+
 
 function checkIfVideoEnded() {
     vidDur = vid.duration  // Duration in seconds
     vidCur = vid.currentTime
-    vidSize = vid.fileSize  // Size in bytes
     updateProgBar()
     if (vid.currentTime >= vid.duration - 0.25) {
-        sendView()
-        isLiked && sendLike()
         playNext();
     }
 }
@@ -75,6 +81,28 @@ function onVideoLoadedMetadata() {
     if (vid.duration !== Infinity) {
         vid.addEventListener('timeupdate', checkIfVideoEnded);
     }
+}
+
+async function getVideoSize(url) {
+    try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return blob.size;
+    } catch (error) {
+        console.error('Error fetching video size:', error);
+        return null;
+    }
+}
+
+async function initVideo(vidNum) {
+    let vidSrc = `./videos/${vidNum}.mp4`;
+
+    vidSize = await getVideoSize(vidSrc);
+    if (vidSize) {
+        logger(`Video size: ${vidSize} bytes`);
+    }
+
+    vid.setAttribute("src", vidSrc);
 }
 
 
@@ -120,14 +148,31 @@ function toggleLike() {
     logger("isLiked : " + isLiked);
 }
 
+function resetLike() {
+    likeEmpty.classList.remove("hidden");
+    likeFull.classList.add("hidden");
+    isLiked = false;
+    likeUpdated = false;
+    clearInterval(likeRetryInterval)
+    logger("isLiked : reset");
+}
+
+function resetView() {
+    vidDur = undefined
+    vidSize = undefined
+    viewUpdated = false;
+    clearInterval(viewRetryInterval)
+}
+
+
 function playNext() {
-    sendView()
     if (!isLooping) {
-        isLiked && sendLike()
         logger("Not looping");
         randVid();
     }
     else {
+        viewUpdated = false;
+        sendView();        // sending 👁️ VIEW
         vid.play();
         logger("Looping");
     }
@@ -144,7 +189,30 @@ function updateProgBar() {
 }
 
 function sendLike() {
-    fetch('https://4am-xi.vercel.app/meta/like', {
+    likeRetryInterval = setInterval(() => {
+        if(!likeUpdated && vidSize && vidDur) {
+            sendLikeReq()
+            clearInterval(likeRetryInterval)
+        } else {
+            logger("Retrying sending like request")
+        }
+    }, 500)
+}
+
+function sendView() {
+    viewRetryInterval = setInterval(() => {
+        if(!viewUpdated && vidSize && vidDur) {
+            sendViewReq()
+            clearInterval(viewRetryInterval)
+        } else {
+            logger("Retrying sending view request")
+        }
+    }, 500)
+}
+
+function sendLikeReq() {
+    // fetch('https://4am-xi.vercel.app/meta/like', {
+    fetch('http://localhost:3000/meta/like', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -152,28 +220,37 @@ function sendLike() {
         body: JSON.stringify({
             size: `${vidSize}`,
             duration: `${vidDur}`,
-            likes: `${isLiked ? 1 : 0}`,
+            vidNum: vidNum
         })
     })
-        .then(response => response.json())
+        .then(response => {
+            likeUpdated = true;
+            return response.json()
+        })
         .then(data => logger(data))
         .catch(error => {
             console.error('Problem adding the LIKE', error);
         });
 }
 
-function sendView() {
-    fetch('https://4am-xi.vercel.app/meta/view', {
+
+function sendViewReq() {
+    // fetch('https://4am-xi.vercel.app/meta/view', {
+    fetch('http://localhost:3000/meta/view', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             size: `${vidSize}`,
-            duration: `${vidDur}`
+            duration: `${vidDur}`,
+            vidNum: vidNum
         })
     })
-        .then(response => response.json())
+        .then(response => {
+            viewUpdated = true
+            return response.json()
+        })
         .then(data => logger(data))
         .catch(error => {
             console.error('Problem adding the VIEW', error);
