@@ -31,13 +31,12 @@ settingsBtn.addEventListener('click', handleSettingClick);
 closeSettingsBtn.addEventListener('click', handleSettingClick);
 
 
-document.addEventListener("DOMContentLoaded", function() {
-randVid();
+document.addEventListener("DOMContentLoaded", function () {
+    randVid();
 })
 
 
-function logger(output)
-{
+function logger(output) {
     console.log(output);
 
     let btemp = document.createElement("span");
@@ -51,9 +50,9 @@ function logger(output)
     }
 }
 
-function randVid(){
-    let vidNum = getRandomNumber(1,totalVids);
-    vid.setAttribute("src", "./videos/"+vidNum+".mp4");
+function randVid() {
+    let vidNum = getRandomNumber(1, totalVids);
+    vid.setAttribute("src", "./videos/" + vidNum + ".mp4");
     logger(vidNum);
     updateProgBar()
 }
@@ -64,9 +63,8 @@ function checkIfVideoEnded() {
     vidSize = vid.fileSize  // Size in bytes
     updateProgBar()
     if (vid.currentTime >= vid.duration - 0.25) {
-        if(isLiked) {
-            sendLike()
-        }
+        sendView()
+        isLiked && sendLike()
         playNext();
     }
 }
@@ -87,7 +85,7 @@ function getRandomNumber(min, max) {
 }
 
 
-function playpause(){
+function playpause() {
     vid.setAttribute("autoplay", "")
     let whichDiv, otherDiv;
     if (vid.paused) {
@@ -103,11 +101,11 @@ function playpause(){
     }
     otherDiv.classList.add('hidden');
     whichDiv.classList.remove('hidden');
-    setTimeout(()=>{whichDiv.classList.add('hidden')}, 500);
+    setTimeout(() => { whichDiv.classList.add('hidden') }, 500);
 }
 
 
-function toggleLoopMode(){
+function toggleLoopMode() {
     loop.classList.toggle("hidden");
     playlist.classList.toggle("hidden");
     isLooping = !isLooping;
@@ -115,53 +113,73 @@ function toggleLoopMode(){
     logger("Looping : " + isLooping);
 }
 
-function toggleLike(){
+function toggleLike() {
     likeEmpty.classList.toggle("hidden");
     likeFull.classList.toggle("hidden");
     isLiked = !isLiked;
     logger("isLiked : " + isLiked);
 }
 
-function playNext(){
-    if(!isLooping){
+function playNext() {
+    sendView()
+    if (!isLooping) {
+        isLiked && sendLike()
         logger("Not looping");
         randVid();
     }
-    else{
+    else {
         vid.play();
         logger("Looping");
     }
 }
 
 let rotationVal = 0
-function handleSettingClick(){
-    settingsBtn.style.transform = `rotate(${rotationVal+60}deg)`; rotationVal += 60;
+function handleSettingClick() {
+    settingsBtn.style.transform = `rotate(${rotationVal + 60}deg)`; rotationVal += 60;
     settingsPanel.classList.toggle("hidden");
 }
 
-function updateProgBar(){
-    progBar.style = `width:${(vidCur/vidDur)*100}%;`
+function updateProgBar() {
+    progBar.style = `width:${(vidCur / vidDur) * 100}%;`
 }
 
 function sendLike() {
-    fetch('https://your-backend-endpoint', {
+    fetch('https://4am-xi.vercel.app/meta/like', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          size: `${vidSize}`,
-          duration: `${vidDur}`,
+            size: `${vidSize}`,
+            duration: `${vidDur}`,
+            likes: `${isLiked ? 1 : 0}`,
         })
-      })
-      .then(response => {
-        logger(response.json())
-      })
-      .catch(error => {
-        console.error('Problem adding the like', error);
-      });
+    })
+        .then(response => response.json())
+        .then(data => logger(data))
+        .catch(error => {
+            console.error('Problem adding the LIKE', error);
+        });
+}
+
+function sendView() {
+    fetch('https://4am-xi.vercel.app/meta/view', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            size: `${vidSize}`,
+            duration: `${vidDur}`
+        })
+    })
+        .then(response => response.json())
+        .then(data => logger(data))
+        .catch(error => {
+            console.error('Problem adding the VIEW', error);
+        });
 }
 
 
-// window.onload = function () 
+// window.onload = function ()
 // };

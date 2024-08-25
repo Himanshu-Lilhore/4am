@@ -23,7 +23,7 @@ app.use(cors({
 }));
 
 
-app.use('/like', likeRouter)
+app.use('/meta', likeRouter)
 
 
 app.listen(PORT, () => {
