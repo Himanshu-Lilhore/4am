@@ -1,5 +1,6 @@
 let totalVids = 187;
 let isLooping = true;
+let isLiked = false;
 
 let refreshBtn = document.getElementById("refreshBtn");
 let vidHolder = document.getElementById("vidHolder");
@@ -7,6 +8,7 @@ let vid = document.getElementById("vid");
 let playDiv = document.querySelector('#play');
 let pauseDiv = document.querySelector('#pause');
 let loopToggleBtn = document.querySelector('#loopToggle');
+let likeToggleBtn = document.querySelector('#likeToggle');
 let playlist = document.querySelector('#playlist');
 let loop = document.querySelector('#loop');
 let settingsBtn = document.querySelector('#settings');
@@ -14,11 +16,14 @@ let settingsPanel = document.querySelector('#settingsPanel');
 let closeSettingsBtn = document.querySelector('#closeSettings');
 let logDisplay = document.querySelector('#log');
 let progBar = document.querySelector('#progBar');
-let vidDur, vidCur
+let likeEmpty = document.querySelector('#likeEmpty');
+let likeFull = document.querySelector('#likeFull');
+let vidDur, vidCur, vidSize, vidNum
 
 refreshBtn.addEventListener('click', randVid);
 vid.addEventListener('click', playpause);
 loopToggleBtn.addEventListener('click', toggleLoopMode);
+likeToggleBtn.addEventListener('click', toggleLike);
 vid.addEventListener('loadedmetadata', onVideoLoadedMetadata);
 vid.addEventListener('timeupdate', checkIfVideoEnded);
 vid.addEventListener('ended', playNext);
@@ -47,17 +52,21 @@ function logger(output)
 }
 
 function randVid(){
-    let randNum = getRandomNumber(1,totalVids);
-    vid.setAttribute("src", "./videos/"+randNum+".mp4");
-    logger(randNum);
+    let vidNum = getRandomNumber(1,totalVids);
+    vid.setAttribute("src", "./videos/"+vidNum+".mp4");
+    logger(vidNum);
     updateProgBar()
 }
 
 function checkIfVideoEnded() {
-    vidDur = vid.duration
+    vidDur = vid.duration  // Duration in seconds
     vidCur = vid.currentTime
+    vidSize = vid.fileSize  // Size in bytes
     updateProgBar()
     if (vid.currentTime >= vid.duration - 0.25) {
+        if(isLiked) {
+            sendLike()
+        }
         playNext();
     }
 }
@@ -106,6 +115,13 @@ function toggleLoopMode(){
     logger("Looping : " + isLooping);
 }
 
+function toggleLike(){
+    likeEmpty.classList.toggle("hidden");
+    likeFull.classList.toggle("hidden");
+    isLiked = !isLiked;
+    logger("isLiked : " + isLiked);
+}
+
 function playNext(){
     if(!isLooping){
         logger("Not looping");
@@ -125,6 +141,25 @@ function handleSettingClick(){
 
 function updateProgBar(){
     progBar.style = `width:${(vidCur/vidDur)*100}%;`
+}
+
+function sendLike() {
+    fetch('https://your-backend-endpoint', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          size: `${vidSize}`,
+          duration: `${vidDur}`,
+        })
+      })
+      .then(response => {
+        logger(response.json())
+      })
+      .catch(error => {
+        console.error('Problem adding the like', error);
+      });
 }
 
 
