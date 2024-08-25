@@ -5,6 +5,7 @@ let viewUpdated = false;
 let likeUpdated = false;
 let vidDur, vidCur, vidSize, vidNum = -1
 let viewRetryInterval, likeRetryInterval
+let likeRetryCounter = 0, viewRetryCounter = 0
 
 let refreshBtn = document.getElementById("refreshBtn");
 let vidHolder = document.getElementById("vidHolder");
@@ -154,14 +155,16 @@ function resetLike() {
     likeFull.classList.add("hidden");
     isLiked = false;
     likeUpdated = false;
+    likeRetryCounter = 0;
     clearInterval(likeRetryInterval)
     logger("isLiked : reset");
 }
 
 function resetView() {
-    vidDur = undefined
-    vidSize = undefined
+    vidDur = undefined;
+    vidSize = undefined;
     viewUpdated = false;
+    viewRetryCounter = 0;
     clearInterval(viewRetryInterval)
 }
 
@@ -197,6 +200,11 @@ function sendLike() {
                 clearInterval(likeRetryInterval)
             } else {
                 logger("Retrying sending like request")
+                likeRetryCounter++
+                if(likeRetryCounter > 15) {
+                    likeRetryCounter = 0
+                    clearInterval(likeRetryInterval)
+                }
             }
         }, 500)
     }
@@ -209,6 +217,11 @@ function sendView() {
             clearInterval(viewRetryInterval)
         } else {
             logger("Retrying sending view request")
+            viewRetryCounter++
+            if(viewRetryCounter > 15) {
+                viewRetryCounter = 0
+                clearInterval(viewRetryInterval)
+            }
         }
     }, 500)
 }
