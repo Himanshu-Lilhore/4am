@@ -1,4 +1,4 @@
-# [4am](https://himanshu-lilhore.github.io/4am)
+# [4am](https://himanshu-lilhore.github.io/4am/client/)
 
 ## Overview
 
@@ -6,9 +6,14 @@
 
 ## Technologies Used
 
+Frontend :
 - JavaScript
 - HTML
 - CSS (with Tailwind CSS)
+Backend :
+- Node.js
+- Express.js
+& MongoDB Atlas
 
 ## Purpose
 
@@ -16,4 +21,8 @@ The primary goal of 4am is to serve as a learning exercise in web development, s
 
 ## Getting Started
 
-To get started with 4am, simply clone the repository to your local machine and open the `index.html` file in your web browser.
+To get started with 4am :
+1. Clone the repository.
+2. Setup a mongoDB atlast cluster and update .env in for the server likewise.
+3. Deploy/run server and add its link to the client code.
+4. Use frontend url to access the app.
