@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const connectDB = require('./config/db')
 const app = express()
-const likeRouter = require('./routes/likeRouter')
+const vidRouter = require('./routes/vidRouter')
 const PORT = process.env.PORT
 const cors = require('cors')
 
@@ -23,7 +23,7 @@ app.use(cors({
 }));
 
 
-app.use('/meta', likeRouter)
+app.use('/meta', vidRouter)
 
 
 app.listen(PORT, () => {

@@ -1,11 +1,12 @@
 let totalVids = 187;
 let isLooping = true;
 let isLiked = false;
-let viewUpdated = false;
-let likeUpdated = false;
+let viewUpdated = 0;
+let likeUpdated = 0;
 let vidDur, vidCur, vidSize, vidNum = -1
 let viewRetryInterval, likeRetryInterval
 let likeRetryCounter = 0, viewRetryCounter = 0
+const maxRetries = 8;
 
 let refreshBtn = document.getElementById("refreshBtn");
 let vidHolder = document.getElementById("vidHolder");
@@ -23,6 +24,7 @@ let logDisplay = document.querySelector('#log');
 let progBar = document.querySelector('#progBar');
 let likeEmpty = document.querySelector('#likeEmpty');
 let likeFull = document.querySelector('#likeFull');
+let stats = document.querySelector('#stats');
 
 refreshBtn.addEventListener('click', randVid);
 vid.addEventListener('click', playpause);
@@ -34,6 +36,7 @@ vid.addEventListener('timeupdate', checkIfVideoEnded);
 vid.addEventListener('ended', playNext);
 settingsBtn.addEventListener('click', handleSettingClick);
 closeSettingsBtn.addEventListener('click', handleSettingClick);
+stats.addEventListener('click', showStats);
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -71,6 +74,9 @@ async function randVid() {
 function checkIfVideoEnded() {
     vidDur = vid.duration  // Duration in seconds
     vidCur = vid.currentTime
+    if(likeUpdated > 1 || viewUpdated > 1) {
+        location.reload();
+    }
     updateProgBar()
     if (vid.currentTime >= vid.duration - 0.25) {
         playNext();
@@ -154,7 +160,7 @@ function resetLike() {
     likeEmpty.classList.remove("hidden");
     likeFull.classList.add("hidden");
     isLiked = false;
-    likeUpdated = false;
+    likeUpdated = 0;
     likeRetryCounter = 0;
     clearInterval(likeRetryInterval)
     logger("isLiked : reset");
@@ -163,7 +169,7 @@ function resetLike() {
 function resetView() {
     vidDur = undefined;
     vidSize = undefined;
-    viewUpdated = false;
+    viewUpdated = 0;
     viewRetryCounter = 0;
     clearInterval(viewRetryInterval)
 }
@@ -175,7 +181,7 @@ function playNext() {
         randVid();
     }
     else {
-        viewUpdated = false;
+        viewUpdated = 0;
         sendView();        // sending 👁️ VIEW
         vid.play();
         logger("Looping");
@@ -201,7 +207,7 @@ function sendLike() {
             } else {
                 logger("Retrying sending like request")
                 likeRetryCounter++
-                if(likeRetryCounter > 15) {
+                if(likeRetryCounter > maxRetries) {
                     likeRetryCounter = 0
                     clearInterval(likeRetryInterval)
                 }
@@ -218,7 +224,7 @@ function sendView() {
         } else {
             logger("Retrying sending view request")
             viewRetryCounter++
-            if(viewRetryCounter > 15) {
+            if(viewRetryCounter > maxRetries) {
                 viewRetryCounter = 0
                 clearInterval(viewRetryInterval)
             }
@@ -236,12 +242,12 @@ function sendLikeReq() {
         credentials: 'include',
         body: JSON.stringify({
             size: `${vidSize}`,
-            duration: `${vidDur}`,
+            duration: `${Math.floor(vidDur)}`,
             vidNum: vidNum
         })
     })
         .then(response => {
-            likeUpdated = true;
+            likeUpdated++;
             return response.json()
         })
         .then(data => logger(data))
@@ -261,18 +267,23 @@ function sendViewReq() {
         credentials: 'include',
         body: JSON.stringify({
             size: `${vidSize}`,
-            duration: `${vidDur}`,
+            duration: `${Math.floor(vidDur)}`,
             vidNum: vidNum
         })
     })
         .then(response => {
-            viewUpdated = true
+            viewUpdated++
             return response.json()
         })
         .then(data => logger(data))
         .catch(error => {
             console.error('Problem adding the VIEW', error);
         });
+}
+
+
+function showStats() {
+    window.location.href = "./stats/stats.html";
 }
 
 

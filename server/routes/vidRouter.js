@@ -42,6 +42,7 @@ const addView = async (req, res) => {
     }
 }
 
+
 const deleteAll = async (req, res) => {
     try {
             await Video.deleteMany({})
@@ -53,9 +54,36 @@ const deleteAll = async (req, res) => {
     }
 }
 
+
+const showAll = async (req, res) => {
+    try {
+        const allVideos = await Video.find()
+        res.status(200).json(allVideos)
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+}
+
+
+const deleteOne = async (req, res) => {
+    try {
+        const deletedVideo = await Video.deleteOne({ _id: req.body._id });
+        if (!deletedVideo.deletedCount) {
+            return res.status(404).json({ error: 'Record not found' });
+        }
+        console.log('Record deleted : ', req.body._id)
+        res.status(200).json({ message: 'Record deleted successfully', deletedVideo });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+}
+
+
 router.post('/like', addLike)
 router.post('/view', addView)
 router.get('/delete-all', deleteAll)
+router.get('/show-all', showAll)
+router.delete('/delete', deleteOne)
 
 
 module.exports = router; 
