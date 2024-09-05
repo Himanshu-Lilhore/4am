@@ -72,8 +72,8 @@ function view(data) {
 
 function fetchAllData() {
     console.log("fetching all data...")
-    // fetch('https://4am-xi.vercel.app/meta/show-all', {
-    fetch('http://localhost:3000/meta/show-all', {
+    fetch('https://4am-xi.vercel.app/meta/show-all', {
+    // fetch('http://localhost:3000/meta/show-all', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -92,8 +92,8 @@ function fetchAllData() {
 }
 
 function deleteRecord(id) {
-    // fetch('https://4am-xi.vercel.app/meta/delete', {
-    fetch('http://localhost:3000/meta/delete', {
+    fetch('https://4am-xi.vercel.app/meta/delete', {
+    // fetch('http://localhost:3000/meta/delete', {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
