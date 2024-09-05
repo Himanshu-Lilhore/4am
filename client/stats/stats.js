@@ -82,6 +82,7 @@ function view() {
             if (key === 'vidNum') {
                 tempCell = document.createElement("a");
                 tempCell.setAttribute('href', `https://himanshu-lilhore.github.io/4am/client/videos/${rowData[key]}.mp4`)
+                tempCell.setAttribute('target', `_blank`)
                 tempCell.classList.add('text-blue-600')
             }
 
