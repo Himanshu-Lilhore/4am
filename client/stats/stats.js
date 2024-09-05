@@ -99,6 +99,19 @@ function view() {
             if (key === 'duration') {
                 tempCell.textContent += ' s'
             }
+            if (key === 'size') {
+                let val = Math.ceil(parseInt(tempCell.textContent)/1000)
+                if (val > 1000) {
+                    if(val%1000>900)
+                        val = `${Math.ceil(val/1000)} MB`
+
+                    else
+                    val = `${Math.floor(val/1000)}.${Math.ceil((val%1000)/100)} MB`
+                }
+                else
+                    val =  `${val} KB`
+                tempCell.textContent = val
+            }
             tempRow.appendChild(tempCell)
         }
 
