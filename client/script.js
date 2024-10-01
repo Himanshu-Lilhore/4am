@@ -347,8 +347,8 @@ function sendViewReq() {
 }
 
 function metaDataReq() {
-    // fetch('https://4am-xi.vercel.app/meta/data', {
-    fetch('http://localhost:3000/meta/data', {
+    fetch('https://4am-xi.vercel.app/meta/data', {
+    // fetch('http://localhost:3000/meta/data', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -375,8 +375,8 @@ function metaDataReq() {
 
 
 function toggleSuperlikeReq() {
-    // fetch('https://4am-xi.vercel.app/meta/superlike', {
-        fetch('http://localhost:3000/meta/superlike', {
+    fetch('https://4am-xi.vercel.app/meta/superlike', {
+        // fetch('http://localhost:3000/meta/superlike', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

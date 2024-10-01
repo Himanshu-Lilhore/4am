@@ -66,9 +66,9 @@ const addView = async (req, res) => {
 
 const deleteAll = async (req, res) => {
     try {
-            await Video.deleteMany({})
-            console.log("🗑️ - video records are now cleared.")
-            res.status(200).json({ message: "🗑️ - video records are now cleared." })
+        await Video.deleteMany({})
+        console.log("🗑️ - video records are now cleared.")
+        res.status(200).json({ message: "🗑️ - video records are now cleared." })
     } catch (err) {
         res.status(400).json({ error: err.message })
         console.log(err.message)
@@ -92,8 +92,10 @@ const deleteOne = async (req, res) => {
         if (!deletedVideo.deletedCount) {
             return res.status(404).json({ error: 'Record not found' });
         }
-        console.log('Record deleted : ', req.body._id)
-        res.status(200).json({ message: 'Record deleted successfully', deletedVideo });
+        else {
+            console.log('Record deleted : ', req.body._id)
+            res.status(200).json({ message: 'Record deleted successfully', deletedVideo });
+        }
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
@@ -110,8 +112,10 @@ const getMetaData = async (req, res) => {
             console.log(`${req.body.vidNum} - record created & meta data fetched!!`)
             res.status(200).json(newVid)
         }
-        console.log('fetched meta data : ', theVideo)
-        res.status(200).json(theVideo);
+        else {
+            console.log('fetched meta data : ', theVideo)
+            res.status(200).json(theVideo);
+        }
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
