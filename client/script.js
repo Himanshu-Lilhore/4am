@@ -4,10 +4,13 @@ let isLiked = false;
 let viewUpdated = 0;
 let likeUpdated = 0;
 let vidDur, vidCur, vidSize, vidNum = -1
-let viewRetryInterval, likeRetryInterval
-let likeRetryCounter = 0, viewRetryCounter = 0
+let viewRetryInterval, likeRetryInterval, metaRetryInterval, superlikeRetryInterval
+let likeRetryCounter = 0, viewRetryCounter = 0, metaRetryCounter = 0, superlikeRetryCounter = 0;
 const maxRetries = 8;
+let vidMeta = null
 
+
+let title = document.getElementById("title");
 let refreshBtn = document.getElementById("refreshBtn");
 let vidHolder = document.getElementById("vidHolder");
 let vid = document.getElementById("vid");
@@ -25,7 +28,9 @@ let progBar = document.querySelector('#progBar');
 let likeEmpty = document.querySelector('#likeEmpty');
 let likeFull = document.querySelector('#likeFull');
 let stats = document.querySelector('#stats');
+let likesHolder = document.querySelector('#likesHolder');
 
+title.addEventListener('click', toggleSuperlike);
 refreshBtn.addEventListener('click', randVid);
 vid.addEventListener('click', playpause);
 loopToggleBtn.addEventListener('click', toggleLoopMode);
@@ -36,7 +41,7 @@ vid.addEventListener('timeupdate', checkIfVideoEnded);
 vid.addEventListener('ended', playNext);
 settingsBtn.addEventListener('click', handleSettingClick);
 closeSettingsBtn.addEventListener('click', handleSettingClick);
-stats.addEventListener('click', showStats);
+// stats.addEventListener('click', showStats);
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -60,21 +65,23 @@ function logger(output) {
 
 async function randVid() {
     (vidNum !== -1 && isLiked) && sendLike();        // sending ❤️ LIKE
-    resetLike(); resetView();
+    resetLike(); resetView(); resetMetaData(); resetSuperlike();
     vidNum = getRandomNumber(1, totalVids);
     vid.setAttribute("src", "./videos/" + vidNum + ".mp4");
     let inited = await initVideo(vidNum);
     logger(vidNum);
     updateProgBar()
     sendView()     // sending 👁️ VIEW
+    getMetaData()    // fetching META data
 }
+
 
 
 
 function checkIfVideoEnded() {
     vidDur = vid.duration  // Duration in seconds
     vidCur = vid.currentTime
-    if(likeUpdated > 1 || viewUpdated > 1) {
+    if (likeUpdated > 1 || viewUpdated > 1) {
         location.reload();
     }
     updateProgBar()
@@ -127,6 +134,8 @@ function playpause() {
     if (vid.paused) {
         vid.play();
         logger("Played");
+        if (!viewUpdated) {viewRetryCounter = 0; clearInterval(viewRetryInterval); sendView(); }
+        if (!vidMeta) { resetMetaData(); getMetaData(); }
         whichDiv = playDiv;
         otherDiv = pauseDiv
     } else {
@@ -159,11 +168,27 @@ function toggleLike() {
 function resetLike() {
     likeEmpty.classList.remove("hidden");
     likeFull.classList.add("hidden");
+    likesHolder.innerHTML = '0'
     isLiked = false;
     likeUpdated = 0;
     likeRetryCounter = 0;
     clearInterval(likeRetryInterval)
     logger("isLiked : reset");
+}
+
+function resetSuperlike() {
+    title.innerHTML = '4am'
+    superlikeRetryCounter = 0;
+    clearInterval(superlikeRetryInterval)
+    logger("superlike : reset");
+}
+
+function resetMetaData() {
+    title.innerHTML = '4am'
+    vidMeta = null;
+    metaRetryCounter = 0;
+    clearInterval(metaRetryInterval)
+    logger("metaData : reset");
 }
 
 function resetView() {
@@ -183,6 +208,7 @@ function playNext() {
     else {
         viewUpdated = 0;
         sendView();        // sending 👁️ VIEW
+        resetMetaData(); getMetaData();     // fetch META data
         vid.play();
         logger("Looping");
     }
@@ -198,16 +224,21 @@ function updateProgBar() {
     progBar.style = `width:${(vidCur / vidDur) * 100}%;`
 }
 
+function updateMarkers() {
+    title.innerHTML =  vidMeta.isSuperliked ? '4am *' : '4am';
+    likesHolder.innerHTML = vidMeta.likes ? vidMeta.likes : 0;
+}
+
 function sendLike() {
-    if(isLiked) {
+    if (isLiked) {
         likeRetryInterval = setInterval(() => {
-            if(!likeUpdated && vidSize && vidDur) {
+            if (!likeUpdated && vidSize && vidDur) {
                 sendLikeReq()
                 clearInterval(likeRetryInterval)
             } else {
                 logger("Retrying sending like request")
                 likeRetryCounter++
-                if(likeRetryCounter > maxRetries) {
+                if (likeRetryCounter > maxRetries) {
                     likeRetryCounter = 0
                     clearInterval(likeRetryInterval)
                 }
@@ -218,13 +249,13 @@ function sendLike() {
 
 function sendView() {
     viewRetryInterval = setInterval(() => {
-        if(!viewUpdated && vidSize && vidDur) {
+        if (!viewUpdated && vidSize && vidDur) {
             sendViewReq()
             clearInterval(viewRetryInterval)
         } else {
             logger("Retrying sending view request")
             viewRetryCounter++
-            if(viewRetryCounter > maxRetries) {
+            if (viewRetryCounter > maxRetries) {
                 viewRetryCounter = 0
                 clearInterval(viewRetryInterval)
             }
@@ -232,9 +263,42 @@ function sendView() {
     }, 500)
 }
 
+function getMetaData() {
+    metaRetryInterval = setInterval(() => {
+        if (!vidMeta && vidSize && vidDur) {
+            metaDataReq()
+            clearInterval(metaRetryInterval)
+        } else {
+            logger(`Retrying sending meta data request`)
+            metaRetryCounter++
+            if (metaRetryCounter > maxRetries) {
+                metaRetryCounter = 0
+                clearInterval(metaRetryInterval)
+            }
+        }
+    }, 500)
+}
+
+function toggleSuperlike() {
+    superlikeRetryInterval = setInterval(() => {
+        if (vidSize && vidDur) {
+            toggleSuperlikeReq()
+            resetSuperlike()
+            clearInterval(superlikeRetryInterval)
+        } else {
+            logger(`Retrying sending superlike request`)
+            superlikeRetryCounter++
+            if (superlikeRetryCounter > maxRetries) {
+                superlikeRetryCounter = 0
+                clearInterval(superlikeRetryInterval)
+            }
+        }
+    }, 500)
+}
+
 function sendLikeReq() {
     fetch('https://4am-xi.vercel.app/meta/like', {
-    // fetch('http://localhost:3000/meta/like', {
+        // fetch('http://localhost:3000/meta/like', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -248,6 +312,7 @@ function sendLikeReq() {
     })
         .then(response => {
             likeUpdated++;
+            resetMetaData(); getMetaData();
             return response.json()
         })
         .then(data => logger(data))
@@ -259,7 +324,7 @@ function sendLikeReq() {
 
 function sendViewReq() {
     fetch('https://4am-xi.vercel.app/meta/view', {
-    // fetch('http://localhost:3000/meta/view', {
+        // fetch('http://localhost:3000/meta/view', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -281,11 +346,58 @@ function sendViewReq() {
         });
 }
 
-
-function showStats() {
-    window.location.href = "./stats/stats.html";
+function metaDataReq() {
+    // fetch('https://4am-xi.vercel.app/meta/data', {
+    fetch('http://localhost:3000/meta/data', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+            size: `${vidSize}`,
+            duration: `${Math.floor(vidDur)}`,
+            vidNum: vidNum
+        })
+    })
+        .then(response => {
+            return response.json()
+        })
+        .then(data => {
+            vidMeta = data;
+            updateMarkers();
+            logger(data);
+        })
+        .catch(error => {
+            console.error('Problem fetching meta data', error);
+        });
 }
 
 
-// window.onload = function ()
-// };
+function toggleSuperlikeReq() {
+    // fetch('https://4am-xi.vercel.app/meta/superlike', {
+        fetch('http://localhost:3000/meta/superlike', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+            size: `${vidSize}`,
+            duration: `${Math.floor(vidDur)}`,
+            vidNum: vidNum
+        })
+    })
+        .then(response => {
+            resetMetaData(); getMetaData();
+            return response.json()
+        })
+        .then(data => logger(data))
+        .catch(error => {
+            console.error('Problem updating superLIKE', error);
+        });
+}
+
+// function showStats() {
+//     window.location.href = "./stats/stats.html";
+// }

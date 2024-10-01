@@ -20,6 +20,10 @@ const videoSchema = new mongoose.Schema({
     views: {
         type: Number,
         default: 0
+    },
+    isSuperliked: {
+        type: Boolean,
+        default: false
     }
 }, {timestamps: true})
 
