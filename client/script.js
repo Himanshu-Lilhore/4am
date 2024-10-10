@@ -9,6 +9,7 @@ let likeRetryCounter = 0, viewRetryCounter = 0, metaRetryCounter = 0, superlikeR
 const maxRetries = 4;
 let vidMeta = null;
 let superlikedOnly = false;
+let allVids = []
 
 
 let title = document.getElementById("title");
@@ -69,7 +70,11 @@ function logger(output) {
 async function randVid() {
     (vidNum !== -1 && isLiked) && sendLike();        // sending ❤️ LIKE
     vidMeta = undefined; resetLike(); resetView(); resetMetaData(); resetSuperlike();
-    vidNum = getRandomNumber(1, totalVids);
+    if (superlikedOnly && allVids.length > 0) {
+        vidNum = allVids[getRandomNumber(1, allVids.length)];
+    } else {
+        vidNum = getRandomNumber(1, totalVids);
+    }
     vid.setAttribute("src", "./videos/" + vidNum + ".mp4");
     let inited = await initVideo(vidNum);
     logger(vidNum);
@@ -84,7 +89,7 @@ async function randVid() {
 function checkIfVideoEnded() {
     vidDur = vid.duration  // Duration in seconds
     vidCur = vid.currentTime
-    if (vidMeta && superlikedOnly && !(vidMeta.isSuperliked)) {
+    if (superlikedOnly && vidMeta && allVids.length > 0 && !(vidMeta.isSuperliked)) {
         randVid();
     }
     if (likeUpdated > 1 || viewUpdated > 1) {
@@ -160,11 +165,16 @@ function toggleMood() {
     if (superlikedOnly) {
         superlikedOnly = false;
         mood.innerHTML = 'All';
+        allVids = []
     } else {
         superlikedOnly = true;
         mood.innerHTML = 'Superliked';
+        getAllVidsData();
+        // logger(allVids);
+        // allVids = allVids.filter(vid => vid.isSuperliked === true).map(vid => vid.vidNum);
+        // logger(allVids);
     }
-    logger('Superliked only mode : ', superlikedOnly)
+    logger(`Superliked only mode : ${superlikedOnly}`)
 }
 
 
@@ -415,6 +425,25 @@ function toggleSuperlikeReq() {
         .then(data => logger(data))
         .catch(error => {
             console.error('Problem updating superLIKE', error);
+        });
+}
+
+function getAllVidsData() {
+    fetch('https://4am-xi.vercel.app/meta/show-all', {
+        // fetch('http://localhost:3000/meta/show-all', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+    })
+        .then(response => response.json())
+        .then(data => {
+            allVids = data.filter(vid => vid.isSuperliked === true).map(vid => vid.vidNum);
+            logger(`Total superliked vids : ${allVids.length}`);
+        })
+        .catch(error => {
+            console.error('Problem getting AllVidsData', error);
         });
 }
 

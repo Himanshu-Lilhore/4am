@@ -1,5 +1,5 @@
 let table = document.querySelector('#table');
-table.classList.add('flex', 'flex-row', 'gap-8')
+table.classList.add('flex', 'flex-col', 'gap-8', 'overflow-scroll')
 const binIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
 <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
 </svg>`
@@ -47,7 +47,6 @@ function setSort(val) {
 }
 
 function view() {
-    // console.log('running view() function')
     let dataArray = allData
     table.innerHTML = ''
     // console.log(`sorting by ${sortByThis} (${sortDirectionDesc ? 'desc' : 'asc'})`)
@@ -61,31 +60,36 @@ function view() {
         else
             return (b.views - a.views)
     });
-    let tempRow, tempCell, currID
+    let tempRow, tempCell, currID, tempMap = {}
+
+
+    // Title row 
+    tempRow = document.createElement("div");
+    titleRow = dataArray[0]
+    tempRow.classList.add("flex", "flex-row", 'table-row', 'items-center', 'cursor-pointer', 'select-none', 'sticky', 'top-0', 'left-0');
+    for (let key in titleRow) {
+        if (key === '__v' || key === 'createdAt' || key === 'updatedAt' || key === '_id') continue
+        tempCell = document.createElement("div");
+        tempCell.classList.add('px-3', 'table-cell', 'border', 'bg-gray-900', 'py-3', `${cellWidth(key)}`)
+        tempCell.addEventListener('click', () => setSort(key))
+        tempCell.textContent = `${key}${key === sortByThis ? (sortDirectionDesc ? ' (^)' : ' (v)') : ''}`
+        tempMap[key] = tempCell
+    }
+    for (let i = 0; i < apperanceOrder.length; i++) {
+        tempRow.append(tempMap[apperanceOrder[i]]);
+    }
+    tempMap = {}
+    table.appendChild(tempRow)
+
+
+    // Data rows 
     dataArray.forEach((rowData, index) => {
         tempRow = document.createElement("div");
-        if (index === 0) {
-            tempRow.classList.add("flex", "flex-row", 'table-row', 'items-center', 'cursor-pointer');
-            for (let key in rowData) {
-                if (key === '__v' || key === 'createdAt' || key === 'updatedAt' || key === '_id') continue
-                tempCell = document.createElement("div");
-                tempCell.classList.add('px-3', 'table-cell', 'border', `${cellWidth(key)}`)
-                tempCell.addEventListener('click', () => setSort(key))
-                tempCell.textContent = `${key}${key===sortByThis?(sortDirectionDesc?' (^)':' (v)'):''}`
-                tempRow.appendChild(tempCell)
-            }
-            table.appendChild(tempRow)
-            return;
-        }
         tempRow.classList.add("flex", "flex-row", 'table-row', 'items-center', 'cursor-default');
         console.log(rowData.vidNum, rowData)
-        let tempMap = {}
+        tempMap = {}
         for (let key in rowData) {
-            if (key === '__v' || key === 'createdAt' || key === 'updatedAt') continue
-            if (key === '_id') {
-                continue;
-                currID = rowData[key]
-            }
+            if (key === '__v' || key === 'createdAt' || key === 'updatedAt' || key === '_id') continue
             if (key === 'vidNum') {
                 tempCell = document.createElement("a");
                 tempCell.setAttribute('href', `https://himanshu-lilhore.github.io/4am/client/videos/${rowData[key]}.mp4`)
@@ -111,20 +115,19 @@ function view() {
                 tempCell.textContent += ' ⭐'
             }
             if (key === 'size') {
-                let val = Math.ceil(parseInt(tempCell.textContent)/1000)
+                let val = Math.ceil(parseInt(tempCell.textContent) / 1000)
                 if (val > 1000) {
-                    if(val%1000>900)
-                        val = `${Math.ceil(val/1000)} MB`
+                    if (val % 1000 > 900)
+                        val = `${Math.ceil(val / 1000)} MB`
 
                     else
-                    val = `${Math.floor(val/1000)}.${Math.ceil((val%1000)/100)} MB`
+                        val = `${Math.floor(val / 1000)}.${Math.ceil((val % 1000) / 100)} MB`
                 }
                 else
-                    val =  `${val} KB`
+                    val = `${val} KB`
                 tempCell.textContent = val
             }
             tempMap[key] = tempCell
-            // tempRow.appendChild(tempCell)
         }
 
         tempDelBtn = document.createElement("div");
@@ -136,7 +139,7 @@ function view() {
                 table.removeChild(row)
             };
         })(currID, tempRow))
-        for(let i = 0; i<apperanceOrder.length; i++) {
+        for (let i = 0; i < apperanceOrder.length; i++) {
             tempRow.append(tempMap[apperanceOrder[i]]);
         }
         tempMap = {}
