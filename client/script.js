@@ -54,7 +54,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 function logger(output) {
-    console.log(output);
+    if(!(settingsPanel.classList.contains('hidden')))
+        console.log(`4am -- ${output}`);
 
     let btemp = document.createElement("span");
     btemp.textContent = output;

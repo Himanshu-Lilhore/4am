@@ -1,50 +1,70 @@
-body{
-    user-select: none;
+body {
+	user-select: none;
 }
 
 /* Popup container */
 .popup {
-    background-color: black;
-  }
+	background-color: rgba(0, 0, 0, 0.65);
+	backdrop-filter: blur(6px);
+	border-radius: 0.75em;
+}
 
 /* The actual popup (appears on top) */
 .popuptext {
-color: #fff;
-text-align: center;
-border-radius: 6px;
+	color: #fff;
+	text-align: center;
+	border-radius: 6px;
 }
 
-#title{
-  color:rgb(65, 24, 102);
-  font-weight: bold;
-  border-color: rgb(65, 24, 102);
-  border-radius: .300rem;
+#title {
+	color: rgb(65, 24, 102);
+	font-weight: bold;
+	border-color: rgb(65, 24, 102);
+	border-radius: .300rem;
 }
 
-.indv-settings{
-    width : 100%;
-    padding: 3px 0;
-    margin: 3px 0;
+.indv-settings {
+	width: 100%;
+	padding: 1px 0;
+	margin: 1px 0;
 }
 
-#progBar{
-  border-width: 3px;
-  border-color: rgb(9, 102, 23);
+#log{
+	background-color: rgba(0, 0, 0, 0.5);
 }
 
-#play, #pause{
-  pointer-events: none;
+#progBar {
+	border-width: 3px;
+	border-color: rgb(9, 102, 23);
 }
 
-#settings{
-  transition: transform ease-out 300ms;
+#play,
+#pause {
+	pointer-events: none;
+}
+
+#settings {
+	transition: transform ease-out 300ms;
+}
+
+#settings:hover,
+#title:hover,
+#refreshBtn:hover,
+#closeSettings:hover,
+#mood:hover,
+#likeToggle:hover {
+	scale: 1.05;
+	transition: all 0.2s ease-out;
+	filter: saturate(4);
 }
 
 *::-webkit-scrollbar {
-  display: none;
+	display: none;
 }
 
 * {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
+	-ms-overflow-style: none;
+	/* IE and Edge */
+	scrollbar-width: none;
+	/* Firefox */
 }
