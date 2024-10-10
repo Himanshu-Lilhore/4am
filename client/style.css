@@ -17,6 +17,8 @@ border-radius: 6px;
 #title{
   color:rgb(65, 24, 102);
   font-weight: bold;
+  border-color: rgb(65, 24, 102);
+  border-radius: .300rem;
 }
 
 .indv-settings{

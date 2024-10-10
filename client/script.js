@@ -6,8 +6,9 @@ let likeUpdated = 0;
 let vidDur, vidCur, vidSize, vidNum = -1
 let viewRetryInterval, likeRetryInterval, metaRetryInterval, superlikeRetryInterval
 let likeRetryCounter = 0, viewRetryCounter = 0, metaRetryCounter = 0, superlikeRetryCounter = 0;
-const maxRetries = 8;
-let vidMeta = null
+const maxRetries = 4;
+let vidMeta = null;
+let superlikedOnly = false;
 
 
 let title = document.getElementById("title");
@@ -29,6 +30,7 @@ let likeEmpty = document.querySelector('#likeEmpty');
 let likeFull = document.querySelector('#likeFull');
 let stats = document.querySelector('#stats');
 let likesHolder = document.querySelector('#likesHolder');
+let mood = document.querySelector('#mood');
 
 title.addEventListener('click', toggleSuperlike);
 refreshBtn.addEventListener('click', randVid);
@@ -41,6 +43,7 @@ vid.addEventListener('timeupdate', checkIfVideoEnded);
 vid.addEventListener('ended', playNext);
 settingsBtn.addEventListener('click', handleSettingClick);
 closeSettingsBtn.addEventListener('click', handleSettingClick);
+mood.addEventListener('click', toggleMood);
 // stats.addEventListener('click', showStats);
 
 
@@ -65,7 +68,7 @@ function logger(output) {
 
 async function randVid() {
     (vidNum !== -1 && isLiked) && sendLike();        // sending ❤️ LIKE
-    resetLike(); resetView(); resetMetaData(); resetSuperlike();
+    vidMeta = undefined; resetLike(); resetView(); resetMetaData(); resetSuperlike();
     vidNum = getRandomNumber(1, totalVids);
     vid.setAttribute("src", "./videos/" + vidNum + ".mp4");
     let inited = await initVideo(vidNum);
@@ -81,6 +84,9 @@ async function randVid() {
 function checkIfVideoEnded() {
     vidDur = vid.duration  // Duration in seconds
     vidCur = vid.currentTime
+    if (vidMeta && superlikedOnly && !(vidMeta.isSuperliked)) {
+        randVid();
+    }
     if (likeUpdated > 1 || viewUpdated > 1) {
         location.reload();
     }
@@ -134,7 +140,7 @@ function playpause() {
     if (vid.paused) {
         vid.play();
         logger("Played");
-        if (!viewUpdated) {viewRetryCounter = 0; clearInterval(viewRetryInterval); sendView(); }
+        if (!viewUpdated) { viewRetryCounter = 0; clearInterval(viewRetryInterval); sendView(); }
         if (!vidMeta) { resetMetaData(); getMetaData(); }
         whichDiv = playDiv;
         otherDiv = pauseDiv
@@ -147,6 +153,18 @@ function playpause() {
     otherDiv.classList.add('hidden');
     whichDiv.classList.remove('hidden');
     setTimeout(() => { whichDiv.classList.add('hidden') }, 500);
+}
+
+
+function toggleMood() {
+    if (superlikedOnly) {
+        superlikedOnly = false;
+        mood.innerHTML = 'All';
+    } else {
+        superlikedOnly = true;
+        mood.innerHTML = 'Superliked';
+    }
+    logger('Superliked only mode : ', superlikedOnly)
 }
 
 
@@ -177,14 +195,14 @@ function resetLike() {
 }
 
 function resetSuperlike() {
-    title.innerHTML = '4am'
+    title.classList.remove('border-2');
     superlikeRetryCounter = 0;
     clearInterval(superlikeRetryInterval)
     logger("superlike : reset");
 }
 
 function resetMetaData() {
-    title.innerHTML = '4am'
+    title.classList.remove('border-2');
     vidMeta = null;
     metaRetryCounter = 0;
     clearInterval(metaRetryInterval)
@@ -225,7 +243,9 @@ function updateProgBar() {
 }
 
 function updateMarkers() {
-    title.innerHTML =  vidMeta.isSuperliked ? '4am *' : '4am';
+    vidMeta.isSuperliked ?
+        title.classList.add('border-2') :
+        title.classList.remove('border-2');
     likesHolder.innerHTML = vidMeta.likes ? vidMeta.likes : 0;
 }
 
@@ -348,7 +368,7 @@ function sendViewReq() {
 
 function metaDataReq() {
     fetch('https://4am-xi.vercel.app/meta/data', {
-    // fetch('http://localhost:3000/meta/data', {
+        // fetch('http://localhost:3000/meta/data', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

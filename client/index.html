@@ -30,7 +30,7 @@
 
     <section id="vidContent" class="flex justify-center" style="color: rgba(96, 210, 255, 0.381);">
         <div class="relative flex justify-center">
-            <div id="title" class="absolute z-10 left-0 pl-3 pt-2">4am</div>
+            <div id="title" class="absolute z-10 left-3 top-2 px-1">4am</div>
 
             <div id="vidHolder" class="relative flex justify-center">
                 <!-- video -->
@@ -135,6 +135,12 @@
                 <!-- Settings panel -->
                 <div id="settingsPanel"
                     class="popup absolute z-10 h-3/4 w-3/4 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 border-solid border-4 pt-8 hidden">
+                    <div class="flex w-full justify-center items-center text-white gap-2">
+                        <label>Mood  </label>
+                        <button id="mood" class="border rounded-md px-4 py-1 text-white bg-purple-800 font-bold">
+                            All
+                        </button>
+                    </div>
 
                     <button id="closeSettings" class="absolute z-10 top-3 right-3 p-2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -156,7 +162,8 @@
                     </div>
 
                     <!-- Stats icon  -->
-                    <a id='stats' class="absolute bottom-0 right-0" target="_blank" href="https://himanshu-lilhore.github.io/4am/client/stats/stats.html">
+                    <a id='stats' class="absolute bottom-0 right-0" target="_blank"
+                        href="https://himanshu-lilhore.github.io/4am/client/stats/stats.html">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
