@@ -26,3 +26,7 @@ To get started with 4am :
 2. Setup a mongoDB atlast cluster and update .env in for the server likewise.
 3. Deploy/run server and add its link to the client code.
 4. Use frontend url to access the app.
+
+## ffmpeg command to compress a video file
+
+ffmpeg -i input.mp4 -vcodec libx265 -crf 28 output.mp4

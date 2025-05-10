@@ -1,4 +1,4 @@
-let totalVids = 227;
+let totalVids = 247;
 let isLooping = true;
 let isLiked = false;
 let viewUpdated = 0;
