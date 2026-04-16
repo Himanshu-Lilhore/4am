@@ -1,4 +1,4 @@
-let totalVids = 247;
+let totalVids = 369;
 let isLooping = true;
 let isLiked = false;
 let viewUpdated = 0;
@@ -68,13 +68,15 @@ function logger(output) {
     }
 }
 
+const lowerBound = 247;
+
 async function randVid() {
     (vidNum !== -1 && isLiked) && sendLike();        // sending ❤️ LIKE
     vidMeta = undefined; resetLike(); resetView(); resetMetaData(); resetSuperlike();
     if (superlikedOnly && allVids.length > 0) {
         vidNum = allVids[getRandomNumber(1, allVids.length)];
     } else {
-        vidNum = getRandomNumber(1, totalVids);
+        vidNum = getRandomNumber(lowerBound, totalVids);
     }
     vid.setAttribute("src", "./videos/" + vidNum + ".mp4");
     let inited = await initVideo(vidNum);
